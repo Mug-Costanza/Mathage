@@ -1,0 +1,375 @@
+:root {
+  --background-color: #111827;
+  --text-color: #e5e7eb;
+  --accent-color: #2dd4bf;
+  --problem-bg-color: #374151;
+  --light-gray: #ccc;
+  --dark-gray: #333;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+  color: var(--text-color);
+  background: var(--background-color);
+}
+
+.App {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 2rem;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.title {
+  font-size: 3rem;
+  margin-bottom: 2rem;
+  font-weight: 600;
+  color: var(--accent-color);
+}
+
+.main-button {
+  padding: 1rem 2.5rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  border-radius: 50px;
+  background: var(--text-color);
+  color: var(--background-color);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
+}
+
+.main-button:hover {
+  transform: translateY(-3px);
+  background-color: var(--light-gray);
+}
+
+.problem-scroller-container {
+  width: 100%;
+  max-width: 400px;
+  height: 100px;
+  overflow: hidden;
+}
+
+.problem-scroller {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  transition: transform 0.4s ease-in-out;
+}
+
+.problem-slide {
+  flex-shrink: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.problem-display {
+  font-size: 2.5rem;
+  margin: 1rem 0;
+  padding: 1rem 2rem;
+  background: var(--problem-bg-color);
+  border-radius: 15px;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.parsed-answer {
+  font-size: 2rem;
+  margin: 1rem 0;
+  color: var(--accent-color);
+  font-weight: 600;
+}
+
+.button-group {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.action-button {
+  padding: 0.75rem 1.5rem;
+  font-size: 1.1rem;
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+  background: var(--dark-gray);
+  color: var(--text-color);
+  transition: background-color 0.2s ease-in-out;
+}
+
+.action-button:hover {
+  background-color: #444;
+}
+
+.action-button.submit {
+  background: var(--accent-color);
+}
+
+.action-button.submit:hover {
+  background: #20b8a4;
+}
+
+.game-info {
+  margin-top: 1.5rem;
+  font-size: 1.2rem;
+  color: var(--light-gray);
+}
+
+.game-info span {
+  font-weight: 600;
+}
+
+.game-over-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.game-over-container h2 {
+  font-size: 2.5rem;
+  color: var(--accent-color);
+  margin-bottom: 0.5rem;
+}
+
+.game-over-container p {
+  font-size: 1.5rem;
+  margin: 0.5rem 0;
+}
+
+.canvas-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.draw-canvas {
+  background: var(--background-color);
+  border: 2px solid var(--text-color);
+  border-radius: 10px;
+  cursor: crosshair;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.feedback-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 10rem;
+  font-weight: bold;
+  opacity: 1;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.feedback-icon.correct {
+  color: var(--accent-color);
+}
+
+.feedback-icon.incorrect {
+  color: #ef4444;
+}
+
+/* New calendar styles */
+.calendar-container {
+  margin-top: 2rem;
+  width: 100%;
+  max-width: 400px;
+  background: var(--problem-bg-color);
+  border-radius: 15px;
+  padding: 1rem;
+}
+
+.calendar-container h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.5rem;
+  color: var(--text-color);
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+.calendar-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+  background: var(--background-color);
+  border-radius: 8px;
+  transition: transform 0.2s ease-in-out;
+  position: relative;
+}
+
+.calendar-day.today {
+  border: 2px solid var(--accent-color);
+}
+
+.calendar-day.completed {
+  background: var(--accent-color);
+}
+
+.day-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 0.75rem;
+  color: var(--background-color);
+  font-weight: bold;
+  margin-top: 4px;
+}
+
+.day-number {
+  font-size: 1rem;
+  font-weight: bold;
+  color: var(--text-color);
+}
+
+.day-time {
+  font-size: 0.75rem;
+}
+
+.toggle-view-button {
+  margin-top: 1rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 50px;
+  background: var(--accent-color);
+  color: var(--background-color);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.toggle-view-button:hover {
+  background-color: #20b8a4;
+}
+
+/* New graph styles */
+.graph-container {
+  margin-top: 2rem;
+  width: 100%;
+  max-width: 500px;
+  height: 250px;
+  background: var(--problem-bg-color);
+  border-radius: 15px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.graph-container h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.5rem;
+  color: var(--text-color);
+}
+
+.graph-y-axis {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 80%;
+  font-size: 0.8rem;
+  color: var(--light-gray);
+  z-index: 1;
+}
+
+/* Replaced graph bars with line graph container */
+.line-graph-container {
+    width: 90%;
+    height: 80%;
+    position: relative;
+    padding-left: 30px;
+}
+
+.line-graph-container svg {
+    width: 100%;
+    height: 100%;
+}
+
+.graph-x-axis {
+    width: 90%;
+    display: flex;
+    justify-content: space-around;
+    padding-left: 30px;
+    font-size: 0.7rem;
+    color: var(--light-gray);
+    margin-top: 5px;
+}
+
+/* Removed old bar chart styles */
+.graph-bars-container, .graph-bar, .bar, .bar-label-time, .bar-label-date {
+  display: none;
+}
+
+/* --- Mobile Responsiveness --- */
+@media (max-width: 600px) {
+  .title {
+    font-size: 2rem;
+  }
+
+  .main-button {
+    padding: 0.8rem 1.8rem;
+    font-size: 1.2rem;
+  }
+
+  .problem-scroller-container {
+    height: 80px;
+  }
+
+  .problem-display {
+    font-size: 2rem;
+  }
+
+  .draw-canvas {
+    width: 300px;
+    height: 300px;
+  }
+
+  .game-info {
+    font-size: 1rem;
+  }
+}
+
+/* Graph polish */
+.graph-empty { color: var(--light-gray); opacity: 0.8; }
+
+.line-graph-container { width: 100%; height: 180px; padding: 0; }
+
+.graph-gridline { stroke: rgba(229,231,235,0.15); stroke-width: 1; }
+
+.graph-tick { fill: var(--light-gray); font-size: 10px; dominant-baseline: middle; }
+
+.graph-avg-line { stroke: rgba(229,231,235,0.35); stroke-dasharray: 4 4; }
+
+.graph-point { fill: var(--accent-color); opacity: 0.9; }
+
+.graph-tooltip-bg { fill: rgba(17,24,39,0.95); stroke: var(--accent-color); stroke-width: 1; }
+
+.graph-tooltip-title { fill: var(--text-color); font-size: 10px; }
+
+.graph-tooltip-value { fill: var(--accent-color); font-weight: 700; font-size: 12px; }
+
