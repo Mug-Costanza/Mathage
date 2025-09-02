@@ -48,7 +48,7 @@ const margin = { top: 12, right: 40, bottom: 28, left: 44 };
     if (dates.length <= 1) return margin.left + iw / 2;
     return margin.left + (idx / (dates.length - 1)) * iw;
   };
-  const y = (val) => margin.top + (1 - (val - min) / (max - min)) * ih;
+  const y = (val) => margin.top + ((val - min) / (max - min)) * ih;
 
   const avg = times.length ? times.reduce((a, b) => a + b, 0) / times.length : 0;
 

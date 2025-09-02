@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-function DrawInput({ onSubmit, onClear, clearCanvasRef }) {
+function DrawInput({ onSubmit, onClear, clearCanvasRef, onDrawingChange }) {
   const canvasRef = useRef(null);
   const [drawing, setDrawing] = useState(false);
 
@@ -47,6 +47,11 @@ function DrawInput({ onSubmit, onClear, clearCanvasRef }) {
     if (e.type === "mousedown" && e.button !== 0) {
       return;
     }
+    
+    // Notify parent component that drawing has started
+    if (onDrawingChange) {
+      onDrawingChange(true);
+    }
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
@@ -60,18 +65,18 @@ function DrawInput({ onSubmit, onClear, clearCanvasRef }) {
     ctx.moveTo(x, y);
   };
 
-  const draw = (e) => {
-    if (!drawing) return;
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
+    const draw = (e) => {
+        if (!drawing) return;
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext("2d");
 
-    // Prevent touch events from triggering mouse events
-    e.preventDefault();
+        // Prevent touch events from triggering mouse events
+        e.preventDefault();
 
-    const { x, y } = getPos(e);
-    ctx.lineTo(x, y);
-    ctx.stroke();
-  };
+        const { x, y } = getPos(e);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+      };
 
   const isCanvasBlank = (canvas) => {
     const ctx = canvas.getContext("2d");
@@ -93,6 +98,11 @@ function DrawInput({ onSubmit, onClear, clearCanvasRef }) {
     const ctx = canvas.getContext("2d");
     ctx.closePath();
     setDrawing(false);
+    
+    // Notify parent component that drawing has ended
+    if (onDrawingChange) {
+      onDrawingChange(false);
+    }
 
     if (!isCanvasBlank(canvas)) {
         submitCanvas();
@@ -119,21 +129,37 @@ function DrawInput({ onSubmit, onClear, clearCanvasRef }) {
     const imageData = canvas.toDataURL("image/png");
     onSubmit(imageData);
   };
+    
+    useEffect(() => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+
+      const opts = { passive: false }; // override passive
+      canvas.addEventListener("touchstart", startDrawing, opts);
+      canvas.addEventListener("touchmove", draw, opts);
+      canvas.addEventListener("touchend", endDrawing, opts);
+
+      return () => {
+        canvas.removeEventListener("touchstart", startDrawing, opts);
+        canvas.removeEventListener("touchmove", draw, opts);
+        canvas.removeEventListener("touchend", endDrawing, opts);
+      };
+    }, []);
 
   return (
     <div className="canvas-container">
-      <canvas
-        ref={canvasRef}
-        className="draw-canvas"
-        onMouseDown={startDrawing}
-        onMouseMove={draw}
-        onMouseUp={endDrawing}
-        onMouseLeave={endDrawing}
-        onTouchStart={startDrawing}
-        onTouchMove={draw}
-        onTouchEnd={endDrawing}
-        onContextMenu={handleRightClick}
-      />
+          <canvas
+            ref={canvasRef}
+            className="draw-canvas"
+            onMouseDown={startDrawing}
+            onMouseMove={draw}
+            onMouseUp={endDrawing}
+            onMouseLeave={endDrawing}
+            onTouchStart={startDrawing}   // ← remove Capture
+            onTouchMove={draw}            // ← remove Capture
+            onTouchEnd={endDrawing}       // ← remove Capture
+            onContextMenu={handleRightClick}
+          />
     </div>
   );
 }

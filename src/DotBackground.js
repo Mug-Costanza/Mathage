@@ -55,7 +55,7 @@ function DotBackground({ numDots = 100 }) {
         top: 0,
         left: 0,
         zIndex: 0,
-        background: "#111827",
+        background: "#000",
       }}
     />
   );

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import Cookies from 'js-cookie';
 import DotBackground from "./DotBackground";
 import DrawInput from "./DrawInput";
 import { loadMNISTModel, predictDigitsFromDataURL } from "./ml/mnist";
@@ -64,10 +65,17 @@ function App() {
   const [dailyScores, setDailyScores] = useState({});
   const [gameMode, setGameMode] = useState(null);
   const [view, setView] = useState('calendar');
+  const [feedback, setFeedback] = useState(null);
+  const [isDrawing, setIsDrawing] = useState(false);
 
   const autoSubmitTimeoutId = useRef(null);
   const lastPredictedAnswer = useRef("");
   const clearCanvasRef = useRef(null);
+    
+    const [isMuted, setIsMuted] = useState(() => {
+        const muted = Cookies.get('isMuted');
+        return muted === 'true';
+    });
 
   useEffect(() => {
     async function loadModel() {
@@ -79,7 +87,6 @@ function App() {
   }, []);
 
   useEffect(() => {
-    // Load daily game state from localStorage
     const dailyData = localStorage.getItem('mathageDaily');
     const scoresData = localStorage.getItem('mathageScores');
     const today = getDailySeed();
@@ -88,7 +95,6 @@ function App() {
     let loadedScores = scoresData ? JSON.parse(scoresData) : {};
 
     if (loadedState.date !== today) {
-      // New day, reset state
       loadedState = {
         date: today,
         completed: false,
@@ -103,16 +109,16 @@ function App() {
 
   useEffect(() => {
     let interval;
-    if (isGameActive) {
+    if (isGameActive && !isDrawing) {
       interval = setInterval(() => setTimer((t) => t + 1), 1000);
     } else {
       clearInterval(interval);
     }
     return () => clearInterval(interval);
-  }, [isGameActive]);
+  }, [isGameActive, isDrawing]);
 
   useEffect(() => {
-    if (parsedAnswer && parsedAnswer !== lastPredictedAnswer.current) {
+    if (parsedAnswer && parsedAnswer !== lastPredictedAnswer.current && !isDrawing) {
       lastPredictedAnswer.current = parsedAnswer;
       const currentProblem = problems[problemIndex];
       const isCorrect = parseInt(parsedAnswer) === currentProblem?.answer;
@@ -120,10 +126,9 @@ function App() {
       if (autoSubmitTimeoutId.current) {
           clearTimeout(autoSubmitTimeoutId.current);
       }
-      // The delay here can be adjusted for a custom feel
       autoSubmitTimeoutId.current = setTimeout(() => {
           checkAndAdvance(isCorrect);
-      }, isCorrect ? 0 : 3000);
+      }, isCorrect ? 0 : 1000);
     } else if (parsedAnswer === "") {
         if (autoSubmitTimeoutId.current) {
             clearTimeout(autoSubmitTimeoutId.current);
@@ -134,12 +139,20 @@ function App() {
             clearTimeout(autoSubmitTimeoutId.current);
         }
     };
-  }, [parsedAnswer, problemIndex, problems]);
+  }, [parsedAnswer, problemIndex, problems, isDrawing]);
+    
+    function toggleMute() {
+        const newMutedState = !isMuted;
+        setIsMuted(newMutedState);
+        Cookies.set('isMuted', newMutedState, { expires: 365 }); // Save preference for a year
+    }
 
-  function playSound(file) {
-    const audio = new Audio(process.env.PUBLIC_URL + `/${file}`);
-    audio.play();
-  }
+    function playSound(file) {
+        if (isMuted) return;
+        const audio = new Audio(process.env.PUBLIC_URL + `/${file}`);
+        audio.volume = 0.25;
+        audio.play();
+    }
 
   function generateProblem(randomFn) {
     const a = Math.floor(randomFn() * 20) + 1;
@@ -214,17 +227,20 @@ function App() {
 
     if (isCorrect) {
       setScore((s) => s + 1);
+      setFeedback({ text: "✓", type: "correct" });
+      setTimeout(() => setFeedback(null), 1000);
       playSound("correct.mp3");
     } else {
+      setTimer((t) => t + 5);
+      setFeedback({ text: "+5s", type: "incorrect" });
+      setTimeout(() => setFeedback(null), 2000);
       playSound("incorrect.mp3");
     }
 
-    // Shorten the transition by setting the timeout to 0
     if (problemIndex + 1 >= totalProblems) {
       setTimeout(() => {
         setIsGameActive(false);
         if (gameMode === 'daily') {
-          // Save daily score to localStorage
           const today = getDailySeed();
           const finalScore = isCorrect ? score + 1 : score;
           const dailyData = {
@@ -236,7 +252,6 @@ function App() {
           localStorage.setItem('mathageDaily', JSON.stringify(dailyData));
           setDailyGameState(dailyData);
           
-          // Save score to daily scores log
           const newDailyScores = { ...dailyScores, [today]: { score: finalScore, time: timer } };
           localStorage.setItem('mathageScores', JSON.stringify(newDailyScores));
           setDailyScores(newDailyScores);
@@ -272,7 +287,7 @@ function App() {
   }
 
   function calculateBrainAge() {
-    return 20; // Changed to return a fixed value
+    return 20;
   }
 
   const isDailyCompleted = dailyGameState.completed;
@@ -283,7 +298,19 @@ function App() {
       <div className="App">
         <h1 className="title">Mathage</h1>
         
-        {!isGameActive && isDailyCompleted ? (
+          {!isGameActive && practiceCompleted ? (
+            <div className="game-over-container">
+              <h2>Game Over!</h2>
+              <p>Your score: {score} / {totalProblems}</p>
+              <p>Time: {timer} seconds</p>
+              <button onClick={() => startGame('practice')} className="main-button">
+                Play Again
+              </button>
+              <button onClick={() => setPracticeCompleted(false)} className="toggle-view-button" style={{marginTop: '1rem'}}>
+                Back to Menu
+              </button>
+            </div>
+          ) : !isGameActive && isDailyCompleted ? (
             <div className="game-over-container">
               <h2>Daily Challenge Complete!</h2>
               <p>Your score: {dailyGameState.score} / {totalProblems}</p>
@@ -292,22 +319,10 @@ function App() {
               <button onClick={() => startGame('practice')} className="main-button">
                 Start Practice Mode
               </button>
-              <button className="toggle-view-button" onClick={() => setView(view === 'calendar' ? 'graph' : 'calendar')}>
-                {view === 'calendar' ? 'Show Graph View' : 'Show Calendar View'}
-              </button>
+                                                   <button className="toggle-view-button" onClick={() => setView(view === 'calendar' ? 'graph' : 'calendar')}>
+                                                     {view === 'calendar' ? 'Show Graph View' : 'Show Calendar View'}
+                                                   </button>
               {view === 'calendar' ? <Calendar dailyScores={dailyScores} /> : <GraphView dailyScores={dailyScores} />}
-            </div>
-          ) : !isGameActive && practiceCompleted ? (
-            <div className="game-over-container">
-                <h2>Game Over!</h2>
-                <p>Your score: {score} / {totalProblems}</p>
-                <p>Time: {timer} seconds</p>
-                <button onClick={() => startGame('practice')} className="main-button">
-                    Play Again
-                </button>
-                <button onClick={() => setPracticeCompleted(false)} className="action-button" style={{marginTop: '1rem'}}>
-                    Back to Menu
-                </button>
             </div>
           ) : (
             <>
@@ -323,9 +338,26 @@ function App() {
                     onSubmit={handleCanvasSubmit}
                     onClear={handleClearParsed}
                     clearCanvasRef={clearCanvasRef}
+                    onDrawingChange={setIsDrawing}
                   />
+                  <div className="button-group">
+                    <button onClick={handleClearParsed} className="main-button">Clear</button>
+                               </div>
+                               <div>
+                               <button onClick={toggleMute} className="main-button">
+                                   {isMuted ? 'Unmute' : 'Mute'}
+                               </button>
+                               </div>
                   <div className="game-info">
                     <span>Score:</span> {score} | <span>Problem:</span> {problemIndex + 1}/{totalProblems} | <span>Timer:</span> {timer}s
+                    <span className="feedback-container">
+                        <span className={`feedback-inline incorrect ${feedback?.text === '+5s' ? 'show' : ''}`}>
+                            +5s
+                        </span>
+                        <span className={`feedback-inline correct ${feedback?.text === '✓' ? 'show' : ''}`}>
+                            ✓
+                        </span>
+                    </span>
                   </div>
                 </>
               ) : (
@@ -337,12 +369,20 @@ function App() {
                     <button onClick={() => startGame('practice')} className="main-button" disabled={modelLoading}>
                       {modelLoading ? "Loading..." : "Start Practice Mode"}
                     </button>
+                   </div>
+                   <div>
+                   <button onClick={toggleMute} className="main-button">
+                       {isMuted ? 'Unmute' : 'Mute'}
+                   </button>
                   </div>
                 </>
               )}
             </>
           )
         }
+          <div className="app-footer">
+                 <a href="/privacy-policy.html" className="privacy-policy-link">Privacy Policy</a>
+             </div>
       </div>
     </>
   );

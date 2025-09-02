@@ -1,0 +1,41 @@
+.feedback-message {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-left: 0.8rem;
+  position: relative; /* Allows for precise positioning */
+  display: inline-block; /* Essential for transform to work correctly */
+  animation: feedbackPopFade 2s ease-out forwards; /* Apply animation */
+  transform-origin: left center; /* Scale from the left */
+}
+
+.feedback-message.correct {
+  color: var(--accent-color); /* Greenish color for correct */
+}
+
+.feedback-message.incorrect {
+  color: #ef4444; /* Red color for incorrect */
+}
+
+/* Keyframes for the animation */
+@keyframes feedbackPopFade {
+  0% {
+    opacity: 0;
+    transform: scale(0.8); /* Start smaller */
+    top: 0;
+  }
+  20% {
+    opacity: 1;
+    transform: scale(1.1); /* Pop a bit larger */
+    top: -5px; /* Slight upward movement */
+  }
+  80% {
+    opacity: 1;
+    transform: scale(1); /* Settle back to normal size */
+    top: -5px;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.8); /* Fade out and shrink slightly */
+    top: -15px; /* Continue moving up */
+  }
+}
