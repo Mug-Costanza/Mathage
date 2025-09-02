@@ -12,6 +12,7 @@
       margin: 0;
       padding: 2rem;
       line-height: 1.6;
+      text-align: left;
     }
     h1, h2 {
       color: #2dd4bf;
@@ -27,12 +28,28 @@
       max-width: 800px;
       margin: 0 auto;
     }
+    .back-button {
+      display: inline-block;
+      margin-top: 2rem;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 50px;
+      background: #2dd4bf;
+      color: #111827;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .back-button:hover {
+      background-color: #20b8a4;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Privacy Policy</h1>
-    <p><em>Last updated: September 2, 2025</em></p>
+    <p><em>Last updated: [Insert Date]</em></p>
 
     <h2>1. Information We Collect</h2>
     <p>
@@ -82,7 +99,9 @@
     <p>We may update this Privacy Policy from time to time. The latest version will always be available at <code>/privacy-policy.html</code>.</p>
 
     <h2>9. Contact Us</h2>
-    <p>If you have questions about this Privacy Policy, you can reach us at: <a href="mailto:mugcostanza64@gmail.com">mugcostanza64@gmail.com</a>.</p>
+    <p>If you have questions about this Privacy Policy, you can reach us at: <a href="mailto:[your-email]">[your-email]</a>.</p>
+
+    <button class="back-button" onclick="window.location.href='/'">← Back to Menu</button>
   </div>
 </body>
 </html>

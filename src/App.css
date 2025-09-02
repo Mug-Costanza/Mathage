@@ -425,7 +425,8 @@ body {
 }
 
 .app-footer {
-    margin-top: 2rem;
+    margin-top: 1rem;
+    margin-bottom: 2rem;
     padding-top: 1rem;
     width: 100%;
     text-align: center;
