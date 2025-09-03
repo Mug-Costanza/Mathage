@@ -8,7 +8,7 @@ function getDailySeed() {
   return dateStr;
 }
 
-function Calendar({ dailyScores }) {
+function Calendar({ dailyScores, bestScoreDate }) {
     const today = getDailySeed();
     const now = new Date();
     const currentMonth = now.getMonth();
@@ -32,9 +32,14 @@ function Calendar({ dailyScores }) {
             <div className="calendar-grid">
                 {calendarDays.map((day) => {
                     const info = getDayInfo(day);
+                    const dateKey = `${currentYear}${String(currentMonth + 1).padStart(2, '0')}${String(day).padStart(2, '0')}`;
+                    const isBestDay = dateKey === bestScoreDate;
                     const isToday = today === getDailySeed(currentYear, currentMonth, day);
                     return (
-                        <div key={day} className={`calendar-day ${info ? 'completed' : ''} ${isToday ? 'today' : ''}`}>
+                        <div
+                          key={day}
+                          className={`calendar-day ${info ? 'completed' : ''} ${isToday ? 'today' : ''} ${isBestDay ? 'best-day' : ''}`}
+                        >
                             <span className="day-number">{day}</span>
                             {info && (
                                 <div className="day-info">
