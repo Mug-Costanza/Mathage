@@ -367,14 +367,11 @@ function App() {
                     <button onClick={() => startGame('daily')} className="main-button" disabled={modelLoading}>
                       {modelLoading ? "Loading..." : "Start Daily Challenge"}
                     </button>
+                   <div className="start-menu-container">
                     <button onClick={() => startGame('practice')} className="main-button" disabled={modelLoading}>
                       {modelLoading ? "Loading..." : "Start Practice Mode"}
                     </button>
                    </div>
-                   <div>
-                   <button onClick={toggleMute} className="main-button">
-                       {isMuted ? 'Unmute' : 'Mute'}
-                   </button>
                   </div>
                 </>
               )}

@@ -59,6 +59,10 @@ body {
   background-color: var(--light-gray);
 }
 
+.start-menu-container {
+    margin-top: 1rem;
+}
+
 .problem-scroller-container {
   width: 100%;
   max-width: 400px;
